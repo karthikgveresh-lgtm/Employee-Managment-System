@@ -1,12 +1,10 @@
 /**
  * @file src/components/EmployeeTable.tsx
- * @description High-density data grid table for Enterprise Employee Management.
- * Implements clean column alignment, tabular numerals, unboxed metadata,
- * and responsive overflow handling.
+ * @description Neo-Bento High-Density Table with tabular figures and spring highlights.
  */
 
 import React from 'react';
-import { Mail, Edit3, Trash2, Eye, Calendar, Building, Briefcase } from 'lucide-react';
+import { Mail, Edit3, Trash2, Eye, Calendar, Building2, Briefcase } from 'lucide-react';
 import { Employee } from '../types/employee.ts';
 
 interface EmployeeTableProps {
@@ -23,32 +21,32 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   onView,
 }) => {
   return (
-    <div className="glass-panel rounded-2xl overflow-hidden border border-slate-800/80">
+    <div className="bento-card rounded-[22px] overflow-hidden border border-white/[0.08]">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-slate-800 bg-slate-900/60 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <tr className="border-b border-white/[0.08] bg-white/[0.02] text-[11px] font-bold uppercase tracking-wider text-slate-400">
               <th scope="col" className="py-3.5 px-4 sm:px-6">
-                Employee
+                Team Member
               </th>
               <th scope="col" className="py-3.5 px-4">
-                Department
+                Division
               </th>
               <th scope="col" className="py-3.5 px-4">
-                Designation
+                Role Title
               </th>
               <th scope="col" className="py-3.5 px-4">
-                Work Email
+                Corporate Email
               </th>
               <th scope="col" className="py-3.5 px-4 text-right">
-                Created
+                Joined
               </th>
               <th scope="col" className="py-3.5 px-4 sm:px-6 text-right">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60">
+          <tbody className="divide-y divide-white/[0.05]">
             {employees.map((emp) => {
               const formattedDate = new Date(emp.createdAt).toLocaleDateString('en-US', {
                 month: 'short',
@@ -59,18 +57,18 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               return (
                 <tr
                   key={emp._id}
-                  className="hover:bg-slate-800/40 transition-colors group"
+                  className="hover:bg-violet-500/[0.06] transition-colors group"
                 >
                   {/* Name + Avatar */}
                   <td className="py-3.5 px-4 sm:px-6">
                     <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-lg bg-indigo-950 border border-indigo-700/50 flex items-center justify-center text-xs font-bold text-indigo-300">
+                      <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-violet-600 to-rose-500 flex items-center justify-center text-xs font-bold text-white shadow-sm">
                         {emp.name.slice(0, 2).toUpperCase()}
                       </div>
                       <div>
                         <button
                           onClick={() => onView(emp)}
-                          className="font-medium text-slate-100 group-hover:text-indigo-400 transition-colors hover:underline text-left"
+                          className="font-semibold text-slate-100 group-hover:text-violet-300 transition-colors hover:underline text-left"
                         >
                           {emp.name}
                         </button>
@@ -78,8 +76,8 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     </div>
                   </td>
 
-                  {/* Department (Unboxed text with zero-pill rule) */}
-                  <td className="py-3.5 px-4 text-slate-300 whitespace-nowrap">
+                  {/* Department */}
+                  <td className="py-3.5 px-4 text-slate-300 whitespace-nowrap font-medium">
                     {emp.department}
                   </td>
 
@@ -92,7 +90,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <td className="py-3.5 px-4 font-mono text-xs text-slate-400">
                     <a
                       href={`mailto:${emp.email}`}
-                      className="hover:text-indigo-300 transition-colors"
+                      className="hover:text-violet-300 transition-colors"
                     >
                       {emp.email}
                     </a>
@@ -108,22 +106,22 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => onView(emp)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-300 hover:bg-slate-800 transition-colors"
-                        title="View employee profile"
+                        className="p-1.5 rounded-xl text-slate-400 hover:text-violet-300 hover:bg-white/10 transition-colors"
+                        title="View Dossier"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => onEdit(emp)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-                        title="Edit employee record"
+                        className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                        title="Edit Employee"
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => onDelete(emp)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 transition-colors"
-                        title="Delete employee record"
+                        className="p-1.5 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 transition-colors"
+                        title="Delete Employee"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

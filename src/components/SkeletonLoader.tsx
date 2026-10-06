@@ -19,7 +19,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
 
   if (viewMode === 'table') {
     return (
-      <div className="glass-panel rounded-2xl overflow-hidden border border-slate-800/80 animate-pulse">
+      <div className="obsidian-panel rounded-2xl overflow-hidden border border-slate-800/80 animate-pulse">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
@@ -70,7 +70,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
       {items.map((_, idx) => (
         <div
           key={idx}
-          className="glass-card rounded-2xl p-5 border border-slate-800/60 space-y-4"
+          className="obsidian-card rounded-2xl p-5 border border-slate-800/80 space-y-4"
         >
           {/* Header row */}
           <div className="flex items-center gap-3">

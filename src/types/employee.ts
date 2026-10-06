@@ -50,4 +50,10 @@ export interface ApiResponse<T> {
   count?: number;
   errors?: string[];
   storageMode?: string;
+  storageStatus?: {
+    isMongoConnected: boolean;
+    mode: string;
+    uri: string;
+    lastError?: string | null;
+  };
 }

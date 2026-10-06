@@ -1,11 +1,12 @@
 /**
  * @file src/components/Header.tsx
- * @description Top Navigation Bar conforming strictly to the Top Bar Contract:
- * [Brand title, one line] — [4-6 nav links, 1-2 word labels, single-line] — [1-2 primary actions]
+ * @description Neo-Bento Modular Showcase Top Bar.
+ * Strictly adheres to Top Bar Contract (3 zones, single text brand wordmark, clean unboxed nav).
  */
 
 import React from 'react';
-import { Plus, Database, Sparkles, Code2, Users, Layers } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Plus, Sparkles, Code2, Users, LayoutGrid, Layers, BarChart3 } from 'lucide-react';
 
 interface HeaderProps {
   onOpenCreateModal: () => void;
@@ -23,12 +24,12 @@ export const Header: React.FC<HeaderProps> = ({
   totalEmployees,
 }) => {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-white/[0.08] bg-[#0b0d14]/85 backdrop-blur-2xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Zone 1: Single text element wordmark */}
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 shadow-md shadow-indigo-500/20 ring-1 ring-white/20">
-            <Users className="h-5 w-5 text-white" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-tr from-violet-600 via-fuchsia-600 to-rose-500 shadow-md shadow-violet-600/30 ring-1 ring-white/20">
+            <LayoutGrid className="h-4 w-4 text-white" />
           </div>
           <a
             href="/"
@@ -36,19 +37,22 @@ export const Header: React.FC<HeaderProps> = ({
               e.preventDefault();
               setActiveNavTab('directory');
             }}
-            className="text-lg font-bold tracking-tight text-white hover:text-indigo-300 transition-colors"
+            className="text-lg font-bold tracking-tight text-white hover:text-violet-300 transition-colors flex items-center gap-2"
           >
-            GUPIO EMS
+            <span>GUPIO EMS</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-gradient-bento hidden sm:inline px-2 py-0.5 rounded-full bg-violet-500/10 border border-violet-500/20">
+              Neo-Bento
+            </span>
           </a>
         </div>
 
         {/* Zone 2: Clean text navigation links */}
-        <nav className="hidden md:flex items-center gap-7 text-sm font-medium">
+        <nav className="hidden md:flex items-center gap-8 text-xs font-semibold uppercase tracking-wider">
           <button
             onClick={() => setActiveNavTab('directory')}
             className={`whitespace-nowrap transition-colors relative py-1 ${
               activeNavTab === 'directory'
-                ? 'text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-indigo-500'
+                ? 'text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-gradient-to-r after:from-violet-500 after:to-rose-500'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -58,28 +62,28 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setActiveNavTab('departments')}
             className={`whitespace-nowrap transition-colors relative py-1 ${
               activeNavTab === 'departments'
-                ? 'text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-indigo-500'
+                ? 'text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-gradient-to-r after:from-violet-500 after:to-rose-500'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Departments
+            Divisions
           </button>
           <button
             onClick={() => setActiveNavTab('analytics')}
             className={`whitespace-nowrap transition-colors relative py-1 ${
               activeNavTab === 'analytics'
-                ? 'text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-indigo-500'
+                ? 'text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-gradient-to-r after:from-violet-500 after:to-rose-500'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Metrics
+            Telemetry
           </button>
           <button
             onClick={onOpenApiDocs}
-            className="whitespace-nowrap text-slate-400 hover:text-indigo-400 transition-colors flex items-center gap-1.5"
+            className="whitespace-nowrap text-slate-400 hover:text-violet-300 transition-colors flex items-center gap-1.5"
           >
-            <Code2 className="h-3.5 w-3.5" />
-            API Docs
+            <Code2 className="h-3.5 w-3.5 text-violet-400" />
+            <span>API Docs</span>
           </button>
         </nav>
 
@@ -87,20 +91,22 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-3">
           <button
             onClick={onOpenApiDocs}
-            className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-900 border border-slate-800"
+            className="md:hidden p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/5 border border-white/10"
             title="API Documentation"
             aria-label="View API Documentation"
           >
             <Code2 className="h-4 w-4" />
           </button>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={onOpenCreateModal}
-            className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-600/30 transition-all duration-200 hover:bg-indigo-500 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 whitespace-nowrap"
+            className="group btn-bento-violet inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2 text-xs font-bold text-white tracking-wide whitespace-nowrap shadow-lg shadow-violet-600/30"
           >
             <Plus className="h-4 w-4 transition-transform group-hover:rotate-90 duration-200" />
-            <span>Add Employee</span>
-          </button>
+            <span>Add Team Member</span>
+          </motion.button>
         </div>
       </div>
     </header>

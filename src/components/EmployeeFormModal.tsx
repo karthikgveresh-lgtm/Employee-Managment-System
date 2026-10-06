@@ -1,14 +1,15 @@
 /**
  * @file src/components/EmployeeFormModal.tsx
- * @description Intuitive Create & Edit Form Modal with comprehensive real-time
- * client-side validation feedback messages and backend error synchronization.
+ * @description Neo-Bento Team Member Registration Modal.
+ * Features real-time client-side RFC email validation, field bounds checking,
+ * and electric violet/coral accents.
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, Check, AlertCircle, Building, Mail, User, Briefcase, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { X, Check, AlertCircle, Building2, Mail, User, Briefcase, Loader2, Sparkles } from 'lucide-react';
 import { Employee, EmployeeFormData, DEPARTMENTS_LIST } from '../types/employee.ts';
 
-// Email regex pattern matching RFC standards
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 interface EmployeeFormModalProps {
@@ -45,7 +46,6 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
   const [serverErrors, setServerErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sync form data when initialData changes
   useEffect(() => {
     if (initialData && mode === 'edit') {
       setFormData({
@@ -69,7 +69,6 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Validate a single field
   const validateField = (field: keyof EmployeeFormData, value: string): string | undefined => {
     switch (field) {
       case 'name':
@@ -78,15 +77,15 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
         if (value.trim().length > 100) return 'Name cannot exceed 100 characters';
         return undefined;
       case 'email':
-        if (!value.trim()) return 'Work email is required';
+        if (!value.trim()) return 'Corporate email is required';
         if (!EMAIL_REGEX.test(value.trim()))
-          return 'Enter a valid corporate email format (e.g. name@domain.com)';
+          return 'Enter a valid corporate email format (e.g. name@company.com)';
         return undefined;
       case 'department':
-        if (!value.trim() || value === 'All') return 'Please select a valid department';
+        if (!value.trim() || value === 'All') return 'Please select a valid division';
         return undefined;
       case 'designation':
-        if (!value.trim()) return 'Designation / job title is required';
+        if (!value.trim()) return 'Role title is required';
         if (value.trim().length < 2) return 'Designation must be at least 2 characters';
         if (value.trim().length > 100) return 'Designation cannot exceed 100 characters';
         return undefined;
@@ -95,7 +94,6 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
     }
   };
 
-  // Run full form validation
   const validateAll = (): boolean => {
     const newErrors: ValidationErrors = {
       name: validateField('name', formData.name),
@@ -145,7 +143,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
         if (result.errors && result.errors.length > 0) {
           setServerErrors(result.errors);
         } else {
-          setServerErrors(['Failed to save employee record. Please review inputs.']);
+          setServerErrors(['Failed to save record. Please check inputs.']);
         }
       } else {
         onClose();
@@ -157,44 +155,54 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
     }
   };
 
-  // Filter out 'All' option for the department dropdown
   const selectableDepts = DEPARTMENTS_LIST.filter((d) => d !== 'All');
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget && !isSubmitting) onClose();
       }}
     >
-      <div className="glass-panel w-full max-w-lg rounded-2xl p-6 sm:p-7 relative border border-slate-700/80 shadow-2xl">
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+        className="bento-card w-full max-w-lg rounded-[26px] p-6 sm:p-7 relative border border-white/10 shadow-2xl"
+      >
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-          <div>
-            <h2 className="text-xl font-bold text-white tracking-tight">
-              {mode === 'create' ? 'Add New Employee' : 'Edit Employee Details'}
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              {mode === 'create'
-                ? 'Fill in the verified details to register employee in Mongoose DB'
-                : 'Update information safely with schema validator enforcement'}
-            </p>
+        <div className="flex items-center justify-between pb-4 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-2xl bg-gradient-to-tr from-violet-600 to-rose-500 flex items-center justify-center text-white font-bold shadow-md">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-white tracking-tight">
+                {mode === 'create' ? 'Add New Team Member' : 'Edit Member Details'}
+              </h2>
+              <p className="text-xs text-violet-300/80 mt-0.5">
+                {mode === 'create'
+                  ? 'Register verified employee record into Mongoose database'
+                  : 'Safely update designation and division assignments'}
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
             disabled={isSubmitting}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Server error feedback panel if any */}
+        {/* Server errors */}
         {serverErrors.length > 0 && (
-          <div className="mt-4 p-3 rounded-xl bg-rose-950/40 border border-rose-800/60 text-xs text-rose-300 flex items-start gap-2.5">
+          <div className="mt-4 p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 flex items-start gap-2.5">
             <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-rose-200">Server Validation Alert:</p>
+              <p className="font-semibold text-rose-200">Validation Notice:</p>
               <ul className="list-disc list-inside mt-0.5 space-y-0.5">
                 {serverErrors.map((err, idx) => (
                   <li key={idx}>{err}</li>
@@ -206,13 +214,12 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-          {/* Field: Full Name */}
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1.5">
               Full Name <span className="text-rose-400">*</span>
             </label>
             <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-violet-400">
                 <User className="h-4 w-4" />
               </div>
               <input
@@ -221,10 +228,8 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
                 onChange={(e) => handleChange('name', e.target.value)}
                 onBlur={() => handleBlur('name')}
                 placeholder="e.g. Maya Sundaram"
-                className={`glass-input w-full rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none transition-all ${
-                  touched.name && errors.name
-                    ? 'border-rose-500/80 focus:border-rose-500 focus:ring-1 focus:ring-rose-500/30'
-                    : ''
+                className={`bento-input w-full rounded-2xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none ${
+                  touched.name && errors.name ? 'border-rose-500' : ''
                 }`}
               />
             </div>
@@ -236,13 +241,12 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
             )}
           </div>
 
-          {/* Field: Work Email */}
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Work Email Address <span className="text-rose-400">*</span>
+              Corporate Email <span className="text-rose-400">*</span>
             </label>
             <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-violet-400">
                 <Mail className="h-4 w-4" />
               </div>
               <input
@@ -251,10 +255,8 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
                 onChange={(e) => handleChange('email', e.target.value)}
                 onBlur={() => handleBlur('email')}
                 placeholder="e.g. maya.sundaram@gupio.corp"
-                className={`glass-input w-full rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none transition-all font-mono ${
-                  touched.email && errors.email
-                    ? 'border-rose-500/80 focus:border-rose-500 focus:ring-1 focus:ring-rose-500/30'
-                    : ''
+                className={`bento-input w-full rounded-2xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none font-mono ${
+                  touched.email && errors.email ? 'border-rose-500' : ''
                 }`}
               />
             </div>
@@ -266,43 +268,35 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
             )}
           </div>
 
-          {/* Field: Department */}
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Department <span className="text-rose-400">*</span>
+              Division Assignment <span className="text-rose-400">*</span>
             </label>
             <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
-                <Building className="h-4 w-4" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-violet-400">
+                <Building2 className="h-4 w-4" />
               </div>
               <select
                 value={formData.department}
                 onChange={(e) => handleChange('department', e.target.value)}
                 onBlur={() => handleBlur('department')}
-                className="glass-input w-full rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 focus:outline-none transition-all appearance-none cursor-pointer"
+                className="bento-input w-full rounded-2xl py-2.5 pl-9 pr-3 text-sm text-slate-100 focus:outline-none appearance-none cursor-pointer"
               >
                 {selectableDepts.map((d) => (
-                  <option key={d} value={d} className="bg-slate-900 text-slate-100">
+                  <option key={d} value={d} className="bg-[#121625] text-white">
                     {d}
                   </option>
                 ))}
               </select>
             </div>
-            {touched.department && errors.department && (
-              <p className="mt-1 text-xs text-rose-400 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
-                {errors.department}
-              </p>
-            )}
           </div>
 
-          {/* Field: Designation */}
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Designation / Role Title <span className="text-rose-400">*</span>
+              Role Title <span className="text-rose-400">*</span>
             </label>
             <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-violet-400">
                 <Briefcase className="h-4 w-4" />
               </div>
               <input
@@ -310,11 +304,9 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
                 value={formData.designation}
                 onChange={(e) => handleChange('designation', e.target.value)}
                 onBlur={() => handleBlur('designation')}
-                placeholder="e.g. Lead Full Stack Systems Architect"
-                className={`glass-input w-full rounded-xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none transition-all ${
-                  touched.designation && errors.designation
-                    ? 'border-rose-500/80 focus:border-rose-500 focus:ring-1 focus:ring-rose-500/30'
-                    : ''
+                placeholder="e.g. Senior Frontend Architect"
+                className={`bento-input w-full rounded-2xl py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none ${
+                  touched.designation && errors.designation ? 'border-rose-500' : ''
                 }`}
               />
             </div>
@@ -326,20 +318,21 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
+          <div className="pt-4 flex items-center justify-end gap-3 border-t border-white/10">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2.5 text-xs font-semibold text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
+              className="px-4 py-2.5 text-xs font-semibold text-slate-400 hover:text-white rounded-2xl hover:bg-white/5 transition-colors"
             >
               Cancel
             </button>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+              className="btn-bento-violet inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-2xl shadow-lg disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
@@ -349,7 +342,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
               ) : mode === 'create' ? (
                 <>
                   <Check className="w-4 h-4" />
-                  <span>Create Employee</span>
+                  <span>Add Member</span>
                 </>
               ) : (
                 <>
@@ -357,10 +350,10 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({
                   <span>Save Changes</span>
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

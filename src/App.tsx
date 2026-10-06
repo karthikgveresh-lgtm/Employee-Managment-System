@@ -1,11 +1,12 @@
 /**
  * @file src/App.tsx
- * @description Main Employee Management System Dashboard.
- * Orchestrates API communication, dynamic search & filtering,
- * modal states, notifications, and high-depth tactile UI presentation.
+ * @description Neo-Bento Dynamic Grid Dashboard (Apple-Style Modular Showcase).
+ * Incorporates asymmetric Bento modules, slide-over glass sheet drawer,
+ * spring micro-interactions (powered by motion), and Electric Violet & Sunset Coral accents.
  */
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Users,
   Plus,
@@ -13,8 +14,7 @@ import {
   FolderOpen,
   FilterX,
   Sparkles,
-  AlertCircle,
-  Database,
+  Layers,
 } from 'lucide-react';
 import { Header } from './components/Header.tsx';
 import { StatsBanner } from './components/StatsBanner.tsx';
@@ -22,7 +22,7 @@ import { FilterBar } from './components/FilterBar.tsx';
 import { EmployeeTable } from './components/EmployeeTable.tsx';
 import { EmployeeCard } from './components/EmployeeCard.tsx';
 import { EmployeeFormModal } from './components/EmployeeFormModal.tsx';
-import { EmployeeDetailModal } from './components/EmployeeDetailModal.tsx';
+import { SlideOverDrawer } from './components/SlideOverDrawer.tsx';
 import { DeleteConfirmModal } from './components/DeleteConfirmModal.tsx';
 import { SkeletonLoader } from './components/SkeletonLoader.tsx';
 import { ErrorAlert } from './components/ErrorAlert.tsx';
@@ -48,6 +48,8 @@ export default function App() {
   );
   const [storageMode, setStorageMode] = useState<string>('mongodb');
   const [isMongoConnected, setIsMongoConnected] = useState<boolean>(false);
+  const [dbError, setDbError] = useState<string | null>(null);
+  const [dbUri, setDbUri] = useState<string>('');
 
   // Filter & View State
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -55,12 +57,15 @@ export default function App() {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [activeNavTab, setActiveNavTab] = useState<string>('directory');
 
-  // Modal State
+  // Modal & Drawer State
   const [isFormModalOpen, setIsFormModalOpen] = useState<boolean>(false);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  // Slide-over Glass Sheet Drawer State
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [drawerMode, setDrawerMode] = useState<'view' | 'edit'>('view');
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isApiDocsOpen, setIsApiDocsOpen] = useState<boolean>(false);
@@ -114,6 +119,19 @@ export default function App() {
           setStorageMode(data.storageMode);
           setIsMongoConnected(data.storageMode === 'mongodb');
         }
+
+        // Fetch detailed storage status
+        try {
+          const statsRes = await fetch('/api/employees/stats');
+          const statsJson = await statsRes.json();
+          if (statsJson.success && statsJson.data?.storageStatus) {
+            setIsMongoConnected(statsJson.data.storageStatus.isMongoConnected);
+            setDbError(statsJson.data.storageStatus.lastError || null);
+            setDbUri(statsJson.data.storageStatus.uri || '');
+          }
+        } catch {
+          // Ignore stats fetch failure
+        }
       } catch (err: unknown) {
         console.error('Failed to fetch employees:', err);
         const errMsg =
@@ -152,7 +170,7 @@ export default function App() {
     formData: EmployeeFormData
   ): Promise<{ success: boolean; errors?: string[] }> => {
     try {
-      if (formMode === 'create') {
+      if (formMode === 'create' && !selectedEmployee) {
         const res = await fetch('/api/employees', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -170,12 +188,12 @@ export default function App() {
 
         addToast(
           'success',
-          'Employee Record Created',
+          'Team Member Added',
           `${formData.name} was successfully registered in the system.`
         );
         fetchEmployees(false);
         return { success: true };
-      } else if (formMode === 'edit' && selectedEmployee) {
+      } else if ((formMode === 'edit' || isDrawerOpen) && selectedEmployee) {
         const res = await fetch(`/api/employees/${selectedEmployee._id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -191,9 +209,12 @@ export default function App() {
           };
         }
 
+        // Update selected employee in drawer state as well
+        setSelectedEmployee(data.data);
+
         addToast(
           'success',
-          'Employee Record Updated',
+          'Profile Updated',
           `Changes for ${formData.name} were successfully saved.`
         );
         fetchEmployees(false);
@@ -234,6 +255,7 @@ export default function App() {
         `Employee ${selectedEmployee.name} has been removed from database.`
       );
       setIsDeleteModalOpen(false);
+      setIsDrawerOpen(false);
       setSelectedEmployee(null);
       fetchEmployees(false);
     } catch (err: unknown) {
@@ -286,10 +308,18 @@ export default function App() {
     setIsFormModalOpen(true);
   };
 
+  // Open slide-over glass drawer in View mode
+  const handleOpenDetail = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setDrawerMode('view');
+    setIsDrawerOpen(true);
+  };
+
+  // Open slide-over glass drawer in Edit mode
   const handleOpenEdit = (employee: Employee) => {
     setSelectedEmployee(employee);
-    setFormMode('edit');
-    setIsFormModalOpen(true);
+    setDrawerMode('edit');
+    setIsDrawerOpen(true);
   };
 
   const handleOpenDelete = (employee: Employee) => {
@@ -297,13 +327,8 @@ export default function App() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleOpenDetail = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setIsDetailModalOpen(true);
-  };
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col ambient-glow-indigo">
+    <div className="min-h-screen bento-canvas text-slate-100 flex flex-col antialiased">
       {/* Top Bar Navigation */}
       <Header
         onOpenCreateModal={handleOpenCreate}
@@ -315,11 +340,14 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Metric Cards Banner */}
+        {/* Dynamic Bento Grid Showcase Banner */}
         <StatsBanner
           employees={employees}
           storageMode={storageMode}
           isMongoConnected={isMongoConnected}
+          dbError={dbError}
+          dbUri={dbUri}
+          onSelectEmployee={handleOpenDetail}
         />
 
         {/* Dedicated Error Handling Panel if API fails */}
@@ -369,8 +397,8 @@ export default function App() {
               <SkeletonLoader viewMode={viewMode} count={6} />
             ) : employees.length === 0 ? (
               /* Empty State */
-              <div className="glass-panel rounded-2xl p-12 text-center border border-slate-800/80 my-4 max-w-xl mx-auto">
-                <div className="mx-auto w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/20">
+              <div className="bento-card rounded-[26px] p-12 text-center border border-white/10 my-4 max-w-xl mx-auto">
+                <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-tr from-violet-600/20 to-rose-500/20 text-violet-400 flex items-center justify-center mb-4 border border-violet-500/30">
                   {searchTerm || selectedDepartment !== 'All' ? (
                     <FilterX className="w-7 h-7" />
                   ) : (
@@ -379,13 +407,13 @@ export default function App() {
                 </div>
                 <h3 className="text-lg font-bold text-white tracking-tight">
                   {searchTerm || selectedDepartment !== 'All'
-                    ? 'No matching employees found'
-                    : 'No employee records yet'}
+                    ? 'No matching team members found'
+                    : 'No team members registered yet'}
                 </h3>
                 <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">
                   {searchTerm || selectedDepartment !== 'All'
-                    ? 'Try adjusting your search criteria or resetting the department filters.'
-                    : 'Start building your organizational roster by registering your first employee in the system.'}
+                    ? 'Try adjusting your search query or clearing the active department filter.'
+                    : 'Start building your organizational roster by adding your first employee.'}
                 </p>
 
                 <div className="mt-6 flex items-center justify-center gap-3">
@@ -395,23 +423,23 @@ export default function App() {
                         setSearchTerm('');
                         setSelectedDepartment('All');
                       }}
-                      className="px-4 py-2 text-xs font-semibold text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl transition-colors"
+                      className="px-4 py-2 text-xs font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl transition-colors"
                     >
-                      Clear All Filters
+                      Reset All Filters
                     </button>
                   ) : (
                     <button
                       onClick={handleOpenCreate}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02]"
+                      className="btn-bento-violet inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-2xl shadow-lg"
                     >
                       <Plus className="w-4 h-4" />
-                      <span>Add First Employee</span>
+                      <span>Add First Team Member</span>
                     </button>
                   )}
                 </div>
               </div>
             ) : viewMode === 'grid' ? (
-              /* Tactile Glass Card Grid View */
+              /* Bento Modular Cards Grid View */
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {employees.map((emp) => (
                   <EmployeeCard
@@ -436,45 +464,50 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer conforming to anti-slop guidelines (no fake telemetry, quiet real links) */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-xs text-slate-500">
+      {/* Footer conforming to anti-slop guidelines */}
+      <footer className="border-t border-white/[0.06] bg-[#08090f]/90 py-6 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-400">GUPIO EMS</span>
+            <span className="font-bold text-gradient-bento">GUPIO EMS</span>
             <span>·</span>
-            <span>Full Stack Campus Placement System</span>
+            <span>Neo-Bento Modular Showcase</span>
           </div>
           <div className="flex items-center gap-4 text-slate-400">
             <button
               onClick={() => setIsApiDocsOpen(true)}
-              className="hover:text-indigo-400 transition-colors"
+              className="hover:text-violet-300 transition-colors"
             >
-              API Reference
+              API Contracts
             </button>
             <span>·</span>
             <span>Node.js / Express</span>
             <span>·</span>
-            <span>Mongoose & MongoDB</span>
+            <span>MongoDB & Mongoose</span>
           </div>
         </div>
       </footer>
 
-      {/* Modals & Portals */}
+      {/* Slide-Over Glass Sheet Drawer for Seamless Dossier & Inline Editing */}
+      <SlideOverDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        employee={selectedEmployee}
+        mode={drawerMode}
+        onModeChange={setDrawerMode}
+        onUpdate={handleFormSubmit}
+        onDeleteRequest={handleOpenDelete}
+      />
+
+      {/* Create Team Member Modal */}
       <EmployeeFormModal
         isOpen={isFormModalOpen}
         onClose={() => setIsFormModalOpen(false)}
         onSubmit={handleFormSubmit}
-        initialData={selectedEmployee}
-        mode={formMode}
+        initialData={null}
+        mode="create"
       />
 
-      <EmployeeDetailModal
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-        employee={selectedEmployee}
-        onEdit={handleOpenEdit}
-      />
-
+      {/* Delete Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -483,12 +516,13 @@ export default function App() {
         isDeleting={isDeleting}
       />
 
+      {/* API Reference & Security Compliance Modal */}
       <ApiDocsModal
         isOpen={isApiDocsOpen}
         onClose={() => setIsApiDocsOpen(false)}
       />
 
-      {/* Toast Alert Container */}
+      {/* Toast Alert Queue */}
       <ToastAlert toasts={toasts} onDismiss={removeToast} />
     </div>
   );

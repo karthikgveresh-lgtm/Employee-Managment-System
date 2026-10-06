@@ -45,6 +45,8 @@ app.get('/api/health', (_req: Request, res: Response) => {
     database: {
       connected: dbState.isConnected,
       mode: dbState.isConnected ? 'MongoDB Mongoose' : 'Schema-Validated In-Memory Sandbox',
+      uri: dbState.uriUsed,
+      lastError: dbState.lastError,
     },
   });
 });

@@ -107,6 +107,48 @@ export const ApiDocsModal: React.FC<ApiDocsModalProps> = ({ isOpen, onClose }) =
           </button>
         </div>
 
+        {/* Credentials and Repository Safety Warning for Assignment Submission */}
+        <div className="mt-4 p-4 rounded-xl bg-amber-950/40 border border-amber-600/50 text-amber-200">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-base" role="img" aria-label="warning">⚠️</span>
+            <h3 className="font-bold text-sm text-amber-100 tracking-tight">
+              Warning for your Assignment Submission
+            </h3>
+          </div>
+          <p className="text-xs text-amber-200/90 leading-relaxed mb-3">
+            Since this is for the GUPIO practical assignment, the guidelines strictly mention <strong className="text-white font-semibold">Credentials and Repository Safety</strong>.
+          </p>
+          <ul className="space-y-2 text-xs text-amber-100/90 pl-1">
+            <li className="flex items-start gap-2">
+              <span className="text-emerald-400 font-bold shrink-0">✓</span>
+              <div>
+                <strong className="text-white">Do not hardcode this string anywhere inside your actual codebase:</strong>
+                <p className="text-amber-200/70 text-[11px] mt-0.5">
+                  Enforced. The connection string is accessed exclusively via <code className="font-mono bg-amber-900/40 px-1 py-0.5 rounded text-amber-300">process.env.MONGODB_URI</code> in <code className="font-mono bg-amber-900/40 px-1 py-0.5 rounded text-amber-300">backend/config/db.ts</code>.
+                </p>
+              </div>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-emerald-400 font-bold shrink-0">✓</span>
+              <div>
+                <strong className="text-white">Do not push an unhidden .env file containing this string to your public GitHub repository:</strong>
+                <p className="text-amber-200/70 text-[11px] mt-0.5">
+                  Enforced. Local secrets remain in your local <code className="font-mono bg-amber-900/40 px-1 py-0.5 rounded text-amber-300">.env</code> file, while <code className="font-mono bg-amber-900/40 px-1 py-0.5 rounded text-amber-300">.env.example</code> contains only anonymized dummy templates.
+                </p>
+              </div>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-emerald-400 font-bold shrink-0">✓</span>
+              <div>
+                <strong className="text-white">Make sure your .gitignore file includes .env so it is safely ignored during deployment:</strong>
+                <p className="text-amber-200/70 text-[11px] mt-0.5">
+                  Enforced. <code className="font-mono bg-amber-900/40 px-1 py-0.5 rounded text-amber-300">.gitignore</code> contains explicit exclusions for <code className="font-mono bg-amber-900/40 px-1 py-0.5 rounded text-amber-300">.env</code>, <code className="font-mono bg-amber-900/40 px-1 py-0.5 rounded text-amber-300">.env.local</code>, and <code className="font-mono bg-amber-900/40 px-1 py-0.5 rounded text-amber-300">.env*</code> patterns.
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
         {/* Scrollable Endpoints List */}
         <div className="mt-4 overflow-y-auto space-y-4 pr-1 text-xs">
           {endpoints.map((ep, idx) => {

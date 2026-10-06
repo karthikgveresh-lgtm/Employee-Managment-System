@@ -5,6 +5,7 @@ A premium, full-stack, responsive Employee Management System designed for the GU
 ---
 
 ## 📑 Table of Contents
+- [⚠️ Credentials and Repository Safety](#-credentials-and-repository-safety)
 - [Architecture & Tech Stack](#architecture--tech-stack)
 - [Project File Structure](#project-file-structure)
 - [Database Schema (Mongoose)](#database-schema-mongoose)
@@ -13,6 +14,18 @@ A premium, full-stack, responsive Employee Management System designed for the GU
 - [Getting Started / Installation](#getting-started--installation)
 - [Key Features & Bonus Polish](#key-features--bonus-polish)
 - [Evaluation Checklist](#evaluation-checklist)
+
+---
+
+## ⚠️ Credentials and Repository Safety
+
+> **Important for GUPIO Practical Assignment Evaluation**
+>
+> In accordance with the assignment safety and security submission guidelines:
+>
+> 1. **No Hardcoded Connection Strings**: The MongoDB URI is never hardcoded inside any application source file (`server.ts`, `backend/**/*.ts`, `src/**/*.tsx`). It is consumed dynamically via `process.env.MONGODB_URI` through `dotenv`.
+> 2. **No Unhidden `.env` Pushed to Git**: Secrets are stored strictly in local `.env`. The repository only includes `.env.example` with dummy template values.
+> 3. **`.gitignore` Enforces `.env` Exclusions**: `.gitignore` explicitly ignores `.env`, `.env.local`, and `.env*` to prevent accidental credential leakage to public repositories.
 
 ---
 

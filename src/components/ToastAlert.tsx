@@ -24,12 +24,12 @@ export const ToastAlert: React.FC<ToastAlertProps> = ({ toasts, onDismiss }) => 
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`pointer-events-auto p-4 rounded-2xl glass-panel shadow-2xl border transition-all duration-300 animate-in slide-in-from-bottom-3 fade-in flex items-start gap-3 ${
+          className={`pointer-events-auto p-4 rounded-2xl obsidian-panel shadow-2xl border transition-all duration-300 animate-in slide-in-from-bottom-3 fade-in flex items-start gap-3 ${
             toast.type === 'success'
-              ? 'border-emerald-500/40 bg-slate-900/90'
+              ? 'border-emerald-500/40'
               : toast.type === 'error'
-              ? 'border-rose-500/40 bg-slate-900/90'
-              : 'border-indigo-500/40 bg-slate-900/90'
+              ? 'border-rose-500/40'
+              : 'border-amber-500/40'
           }`}
         >
           {toast.type === 'success' && (
@@ -39,7 +39,7 @@ export const ToastAlert: React.FC<ToastAlertProps> = ({ toasts, onDismiss }) => 
             <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
           )}
           {toast.type === 'info' && (
-            <Info className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+            <Info className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
           )}
 
           <div className="flex-1 text-xs">

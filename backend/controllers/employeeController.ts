@@ -604,6 +604,7 @@ export async function getEmployeeStats(_req: Request, res: Response): Promise<vo
           isMongoConnected: dbState.isConnected,
           mode: dbState.isConnected ? 'MongoDB Database' : 'Resilient In-Memory (Schema-Validated)',
           uri: dbState.uriUsed,
+          lastError: dbState.lastError,
         },
       },
     });
